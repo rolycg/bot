@@ -4,9 +4,13 @@ from selenium.webdriver.chrome.options import Options
 import os
 import sys
 
-
+# Main URL
 HOST = 'https://jazwings.com'
+
+# Selenium driver
 CHROMEDRIVER = "/Users/rolycg89/Downloads/chromedriver"
+
+# Postgres configuration
 USER = 'gEphephA6eWr'
 PASSWORD = 'fUBanasp4fup'
 NAME = 'prE8rufr7BUc'
