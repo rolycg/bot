@@ -15,7 +15,6 @@ class Webdriver:
         chrome_options.add_argument("--disable-extensions")
         os.environ["webdriver.chrome.driver"] = CHROMEDRIVER
         self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER, chrome_options=chrome_options)
-        self.driver.maximize_window()
 
     def close(self):
         self.driver.quit()
