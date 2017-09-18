@@ -8,6 +8,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from connections.webdriver import Webdriver
 from output import print_task, print_result, print_error, SUCCESS, FAIL
 
+FACEBOOK_EMAIL = 'tfhvxppger_1505762012@tfbnw.net'
+FACEBOOK_PASSWORD = '123456abc'
+
+LOGGED_URL = 'https://jazwings.com/discover#discHcont'
+
+USERNAME = 'testemail'
+PASSWORD = '123456abc'
+EMAIL = 'testemail1989@gmail.com'
+
 
 class Login:
     def __init__(self, url):
@@ -75,21 +84,20 @@ class Login:
         self.load_elements()
 
         if username:
-            self.clear_input(self.email, 'testemail')
+            self.clear_input(self.email, USERNAME)
         else:
-            self.clear_input(self.email, 'testemail1989@gmail.com')
-        self.clear_input(self.password, '123456abc')
+            self.clear_input(self.email, EMAIL)
+        self.clear_input(self.password, PASSWORD)
 
         self.submit.send_keys(Keys.RETURN)
 
-        logged_url = 'https://jazwings.com/discover#discHcont'
         wait = WebDriverWait(self.driver, 3)
         alert = wait.until(EC.visibility_of_element_located((By.XPATH, '//div[@id="toast-container"]')))
         text = alert.text
         sleep(5)
 
         try:
-            assert self.driver.current_url == logged_url
+            assert self.driver.current_url == LOGGED_URL
             assert text == 'cool, have fun!!'
             self.result['Valid Login'] = SUCCESS
             if username:
@@ -128,6 +136,85 @@ class Login:
         sleep(1)
         print()
 
+    def delete_cookies(self):
+        self.driver.delete_all_cookies()
+
+    def facebook(self, success=True):
+        self.load_elements()
+        main_handle = self.driver.current_window_handle
+
+        facebook = self.driver.find_element_by_id('login-fb')
+        facebook.click()
+        another_window = list(set(self.driver.window_handles) - {main_handle})[0]
+        self.driver.switch_to.window(another_window)
+        sleep(3)
+        email = self.driver.find_element_by_id('email')
+        if success:
+            email.send_keys('rcruz@jazwings.com')
+        else:
+            email.send_keys(FACEBOOK_EMAIL)
+        sleep(1)
+        password = self.driver.find_element_by_id('pass')
+        if success:
+            password.send_keys('Gerr@rd4')
+        else:
+            password.send_keys(FACEBOOK_PASSWORD)
+        sleep(1)
+        login = self.driver.find_element_by_xpath('//label[@id="loginbutton"]/input')
+        login.click()
+        sleep(5)
+        self.driver.switch_to.window(main_handle)
+        sleep(1)
+        if success:
+            try:
+                assert self.driver.current_url == LOGGED_URL
+                print_result('Facebook success Succeed')
+                self.result['Facebook success'] = SUCCESS
+            except AssertionError:
+                print_error('Facebook success login raises an error')
+                self.result['Facebook success'] = FAIL
+        else:
+            try:
+                assert self.driver.current_url == 'https://jazwings.com/login'
+                print_result('Facebook failed Succeed')
+                self.result['Facebook failed'] = SUCCESS
+            except AssertionError:
+                print_error('Facebook failed login raises an error')
+                self.result['Facebook failed'] = FAIL
+        sleep(1)
+        print()
+
+    def google(self):
+        self.load_elements()
+        main_handle = self.driver.current_window_handle
+
+        google = self.driver.find_element_by_id('login-gl')
+        google.click()
+        another_window = list(set(self.driver.window_handles) - {main_handle})[0]
+        self.driver.switch_to.window(another_window)
+        sleep(3)
+
+        email = self.driver.find_element_by_id('identifierId')
+        email.send_keys('rcruz@jazwings.com')
+        next = self.driver.find_element_by_id('identifierNext')
+        next.click()
+        sleep(2)
+
+        password = self.driver.find_element_by_xpath('//input[@name="password"]')
+        password.send_keys('5DDydr9r')
+        next = self.driver.find_element_by_id('passwordNext')
+        next.click()
+        sleep(5)
+        self.driver.switch_to.window(main_handle)
+
+        try:
+            assert self.driver.current_url == LOGGED_URL
+            print_result('Google + success Succeed')
+            self.result['Google + success'] = SUCCESS
+        except AssertionError:
+            print_error('Google + success login raises an error')
+            self.result['Google + success'] = FAIL
+
     def start(self):
         self.webdriver.navigate(self.url)
         sleep(5)
@@ -144,6 +231,12 @@ class Login:
         self.logout()
         print_task('Testing valid credentials - username')
         self.valid_login(username=True)
+        self.logout()
+        print_task('Testing facebook login - Success')
+        self.facebook()
+        self.logout()
+        print_task('Testing google + login - Success')
+        self.google()
         self.logout()
 
         self.driver.quit()
