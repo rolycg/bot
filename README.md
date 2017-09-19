@@ -1,7 +1,7 @@
 # jazwingsBot
 **[Python](https://www.python.org/)**
 *Tested using __Python 3.6__*
-*, but It can be used __Python 3.x__*
+* \n It can be used __Python 3.x__*
 
 1. Install the following requirements:
   - `$ pip install -r requirements.txt`
