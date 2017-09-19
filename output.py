@@ -1,13 +1,10 @@
 import smtplib
 
+
 Server = 'smtp.gmail.com'
 username = 'towpebsmtp2@gmail.com'
 password = 'Gerr@rd4'
 PORT = 465
-
-
-SUCCESS = 'Succeed'
-FAIL = 'Fail'
 
 
 def print_section(msg):

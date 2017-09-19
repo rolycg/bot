@@ -8,7 +8,8 @@ import psycopg2
 
 from connections.database import PostgresProd
 from connections.webdriver import Webdriver
-from output import print_task, print_result, print_error, SUCCESS, FAIL
+from static_vars import FAIL, SUCCESS
+from output import print_task, print_result, print_error
 from static_vars import CONFIRM_URL, REGISTER_URL, CREATED_EMAIL, CREATED_FIRST_NAME, CREATED_LAST_NAME, \
     CREATED_PASSWORD, CREATED_USERNAME, CREATED_SOURCE
 
