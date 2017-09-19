@@ -7,15 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from connections.webdriver import Webdriver
 from output import print_task, print_result, print_error, SUCCESS, FAIL
-
-FACEBOOK_EMAIL = 'tfhvxppger_1505762012@tfbnw.net'
-FACEBOOK_PASSWORD = '123456abc'
-
-LOGGED_URL = 'https://jazwings.com/discover#discHcont'
-
-USERNAME = 'testemail'
-PASSWORD = '123456abc'
-EMAIL = 'testemail1989@gmail.com'
+from static_vars import FACEBOOK_EMAIL, FACEBOOK_PASSWORD, USERNAME, LOGGED_URL, PASSWORD, EMAIL
 
 
 class Login:
@@ -49,11 +41,11 @@ class Login:
             assert self.password is not None
             assert self.submit is not None
             self.result['Login link'] = SUCCESS
+            print_result('Login link Succeed')
         except AssertionError:
             print_error('Login link raises an error')
             self.result['Login link'] = FAIL
 
-        print_result('Login link Succeed')
         print()
 
     @staticmethod
@@ -239,4 +231,4 @@ class Login:
         self.google()
         self.logout()
 
-        self.driver.quit()
+        self.webdriver.close()

@@ -12,10 +12,11 @@ class PostgresProd:
 
     def __init__(self):
         self.cursor = None
+        self.prod = None
 
     def open_database(self):
-        prod = psycopg2.connect(host=POSTGRES_HOST, user=USER, password=PASSWORD, dbname=NAME)
-        self.cursor = prod.cursor()
+        self.prod = psycopg2.connect(host=POSTGRES_HOST, user=USER, password=PASSWORD, dbname=NAME)
+        self.cursor = self.prod.cursor()
 
     def close(self):
         if self.cursor:
