@@ -2,6 +2,7 @@ import sys
 
 from actions.login import Login
 from actions.signup import Signup
+from actions.idea import Idea
 from output import print_section
 
 # Main URL
@@ -16,7 +17,12 @@ if __name__ == '__main__':
     # login.start()
     # print()
 
-    print_section('Sign Up')
-    signup = Signup(HOST)
-    signup.start()
+    # print_section('Sign Up')
+    # signup = Signup(HOST)
+    # signup.start()
+    # print()
+
+    print_section('Idea')
+    idea = Idea(HOST)
+    idea.start()
     print()

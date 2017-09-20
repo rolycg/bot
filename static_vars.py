@@ -1,3 +1,5 @@
+import os
+
 FACEBOOK_EMAIL = 'tfhvxppger_1505762012@tfbnw.net'
 FACEBOOK_PASSWORD = '123456abc'
 
@@ -19,3 +21,14 @@ CREATED_SOURCE = 'Advertisement'
 
 SUCCESS = 'Succeed'
 FAIL = 'Fail'
+
+
+TEST_EMAIL = 'rolycg89@gmail.com'
+TEST_PASSWORD = '123456abc'
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+ASSET = os.path.join(BASE_DIR, 'assets', 'Stanford-1600x400.jpg')
+LINK_ASSET = 'https://youtu.be/DKB-BMhbjew'
+
+

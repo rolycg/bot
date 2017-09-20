@@ -6,9 +6,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from connections.webdriver import Webdriver
-from static_vars import FAIL, SUCCESS
 from output import print_task, print_result, print_error
 from static_vars import FACEBOOK_EMAIL, FACEBOOK_PASSWORD, USERNAME, LOGGED_URL, PASSWORD, EMAIL
+from static_vars import FAIL, SUCCESS
 
 
 class Login:

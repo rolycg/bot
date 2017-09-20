@@ -210,5 +210,4 @@ class Signup:
         sleep(3)
         print_task('Testing Delete User')
         self.delete_user()
-
         self.database.close()
