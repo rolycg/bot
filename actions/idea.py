@@ -106,6 +106,26 @@ class Idea:
         sleep(5)
         self.check_tab('3. Preview', 'Upload Media')
 
+    def preview(self):
+        title = self.driver.find_element_by_id('pdescr')
+        title_header = self.driver.find_element_by_xpath('//h1[@class="ng-binding"]')
+        try:
+            assert title.text == IDEA_TITLE
+            assert title_header.text == IDEA_TITLE
+            print_result('Preview Succeed')
+            self.result['Preview'] = SUCCESS
+        except AssertionError:
+            print_error('Preview Failed')
+            self.result['Preview'] = FAIL
+
+        save_as_draft_buttons = self.driver.find_elements_by_xpath('//button[@type="button"]')
+        for save_as_draft_button in save_as_draft_buttons:
+            if save_as_draft_button.text.strip().lower() == 'save as draft and continue':
+                save_as_draft_button.click()
+                break
+
+        print()
+
     def start(self):
         self.webdriver.navigate(self.url)
         sleep(5)
@@ -126,5 +146,9 @@ class Idea:
         sleep(2)
         print_task('Testing Upload Media Stage')
         self.upload_media()
+        sleep(2)
+        print_task('Testing Preview Stage')
+        self.preview()
+        sleep(2)
 
         self.webdriver.close()
