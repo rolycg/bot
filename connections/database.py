@@ -21,3 +21,6 @@ class PostgresProd:
     def close(self):
         if self.cursor:
             self.cursor.close()
+
+    def commit(self):
+        self.prod.commit()

@@ -1,15 +1,20 @@
+import psycopg2
 from time import sleep
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from connections.database import PostgresProd
 from connections.webdriver import Webdriver
 from output import print_task, print_result, print_error
-from static_vars import TEST_EMAIL, TEST_PASSWORD, SUCCESS, FAIL, ASSET, LINK_ASSET
+from static_vars import TEST_EMAIL, TEST_PASSWORD, TEST_USERNAME, SUCCESS, FAIL, ASSET, LINK_ASSET
 
 IDEA_TITLE = 'Idea Bot Title Test'
+IDEA_SLUG = 'idea-bot-title-test'
 IDEA_DESCRIPTION = 'Idea Bot Title Description'
+COMMENT = 'Test Comment'
 
 
 class Idea:
@@ -17,6 +22,8 @@ class Idea:
         self.webdriver = Webdriver()
         self.webdriver.open_browser()
         self.driver = self.webdriver.driver
+        self.database = PostgresProd()
+        self.database.open_database()
         self.url = url
         self.result = {}
 
@@ -123,8 +130,119 @@ class Idea:
             if save_as_draft_button.text.strip().lower() == 'save as draft and continue':
                 save_as_draft_button.click()
                 break
-
+        sleep(4)
         print()
+
+    def select_option(self, element, value):
+        try:
+            select = self.driver.find_element_by_id(element)
+        except NoSuchElementException:
+            select = self.driver.find_element_by_xpath('//select[@name="' + element + '"]')
+        all_options = select.find_elements_by_tag_name("option")
+        for option in all_options:
+            if option.text.lower().strip() == value.lower():
+                option.click()
+                break
+
+    def fill(self, placeholder, value):
+        address_line_1 = self.driver.find_element_by_xpath('//input[@placeholder="' + placeholder + '"]')
+        address_line_1.send_keys(value)
+
+    def submit(self):
+        self.check_tab('4. Submit', 'Submit')
+        sleep(1)
+        self.select_option('country', 'United States')
+        sleep(1)
+        self.fill('Address Line 1...', '963 Shotgun Road')
+        sleep(1)
+        self.fill('City...', 'Miami')
+        sleep(1)
+        self.fill('State...', 'Florida')
+        sleep(1)
+        self.fill('Zip code...', '33326')
+        sleep(1)
+        self.fill('Phone number...', '9548451367')
+        sleep(1)
+
+        checkbox = self.driver.find_element_by_xpath('//input[@aria-label="I agree"]')
+        self.driver.execute_script('arguments[0].click();', checkbox)
+
+        signature = self.driver.find_element_by_xpath('//input[@name="signature"]')
+        signature.send_keys('SIGNATURE NAME SIGNATURE LAST NAME')
+
+        sleep(1)
+
+        publish_btns = self.driver.find_elements_by_xpath('//button[@class="btn btn-j"]')
+        for publish_btn in publish_btns:
+            if publish_btn.text.strip().lower() == 'publish':
+                publish_btn.click()
+                break
+        sleep(6)
+        h1 = self.driver.find_element_by_id('usernameEdit')
+        try:
+            assert 'profile' in self.driver.current_url
+            assert h1.text.strip() == TEST_USERNAME
+            print_result('Submit Stage Succeed')
+            self.result['Submit stage'] = SUCCESS
+        except AssertionError:
+            print_error('Submit Stage Failed')
+            self.result['Submit stage'] = FAIL
+
+    def delete_idea(self):
+        delete_sql = "DELETE FROM ideas_idea WHERE ideas_idea.title='%s'" % IDEA_TITLE
+        self.database.cursor.execute(delete_sql)
+        self.database.commit()
+        query_sql = "SELECT * FROM ideas_idea WHERE ideas_idea.title='%s'" % IDEA_TITLE
+        self.database.cursor.execute(query_sql)
+        exist = False
+        try:
+            for _ in self.database.cursor.fetchall():
+                exist = True
+                break
+        except psycopg2.ProgrammingError:
+            pass
+
+        try:
+            assert exist is False
+            print_result('Delete Idea Succeed')
+            self.result['Delete Idea'] = SUCCESS
+        except AssertionError:
+            print_error('Delete Idea Failed')
+            self.result['Delete Idea'] = FAIL
+
+    def comment_idea(self):
+        self.webdriver.navigate('https://jazwings.com/ideas/%s' % IDEA_SLUG)
+        text_area = self.driver.find_element_by_id('comment-textarea')
+        text_area.send_keys(COMMENT)
+        sleep(2)
+        button = self.driver.find_element_by_id('sub-comm-btn')
+        button.click()
+
+        wait = WebDriverWait(self.driver, 3)
+        alert = wait.until(EC.visibility_of_element_located((By.XPATH, '//div[@id="points_earned"]')))
+        sleep(1)
+        link_input = alert.find_element_by_id('points_anchor')
+        try:
+            assert link_input.text == '20 points.'
+            print_result('Comment Idea Points Succeed')
+            self.result['Comment Idea Points'] = SUCCESS
+        except AssertionError:
+            print_error('Comment Idea Points Failed')
+            self.result['Comment Idea Points'] = FAIL
+
+        sleep(2)
+        comments = self.driver.find_elements_by_xpath('//div[@id="user-comment"]/p')
+        tmp_comment = None
+        for comment in comments:
+            if comment.text == COMMENT:
+                tmp_comment = True
+        try:
+            assert tmp_comment is not None
+            print_result('Comment Idea Succeed')
+            self.result['Comment Idea'] = SUCCESS
+        except AssertionError:
+            print_error('Comment Idea Failed')
+            self.result['Comment Idea'] = FAIL
 
     def start(self):
         self.webdriver.navigate(self.url)
@@ -150,5 +268,7 @@ class Idea:
         print_task('Testing Preview Stage')
         self.preview()
         sleep(2)
-
+        self.submit()
+        sleep(2)
+        # self.delete_idea()
         self.webdriver.close()

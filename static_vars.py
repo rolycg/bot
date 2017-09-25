@@ -25,6 +25,7 @@ FAIL = 'Fail'
 
 TEST_EMAIL = 'rolycg89@gmail.com'
 TEST_PASSWORD = '123456abc'
+TEST_USERNAME = 'rolando'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
